@@ -6,10 +6,8 @@ import theme from "../../styles";
 
 const index = () => {
   const { data: movies } = useFetch({
-    endpoint:
-      "https://imdb8.p.rapidapi.com/title/v2/get-popular-movies-by-genre",
-    headerType: "rapid-api",
-    params: { genre: "adventure", limit: 10 },
+    endpoint: "https://api.opensubtitles.com/api/v1/discover/most_downloaded",
+    params: { type: "movie", langauges: "all" },
   });
   return (
     <View
@@ -29,8 +27,13 @@ const index = () => {
         }}
       >
         {movies ? (
-          movies.map((value: string) => (
-            <MostDownloadedItem key={value} id={value} />
+          movies.map((value: any) => (
+            <MostDownloadedItem
+              key={value.id}
+              id={value.id}
+              movieName={value.attributes.feature_details.movie_name}
+              imageURI={value.attributes?.related_links[0].img_url}
+            />
           ))
         ) : (
           <View

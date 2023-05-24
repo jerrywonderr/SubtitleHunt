@@ -1,23 +1,18 @@
-import { Tabs, useLocalSearchParams } from "expo-router";
-import {
-  ActivityIndicator,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Tabs, useLocalSearchParams, useRouter } from "expo-router";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import * as Linking from "expo-linking";
 import useFetch from "../lib/hooks/fetch";
 import theme from "../lib/styles";
 import { HeaderText } from "../lib/components/MText";
+import Header from "../lib/components/Header";
 
 const DownloadSubtitle = () => {
   const { subtitle_id } = useLocalSearchParams();
+  const router = useRouter();
 
   const { data, loading } = useFetch({
     method: "POST",
     endpoint: "https://api.opensubtitles.com/api/v1/download",
-    headerType: "subtitle",
     extraHeaders: {
       "Content-Type": "application/json",
       accept: "application/json",
@@ -26,6 +21,7 @@ const DownloadSubtitle = () => {
       file_id: subtitle_id,
     },
   });
+
   return (
     <View
       style={{
@@ -34,16 +30,11 @@ const DownloadSubtitle = () => {
     >
       <Tabs.Screen
         options={{
-          headerTitle: "Download your subtitle",
-          headerStyle: {
-            backgroundColor: theme.colors.primary,
-          },
-          headerTitleStyle: {
-            color: theme.colors.lightWhite,
-          },
+          headerTitle: (props) => (
+            <Header title="Download your subtitle" headerProps={props} />
+          ),
         }}
       />
-      {/* <Image source={{uri: params.image_uri as string}} style={{width: '100%', height: '100%'}} /> */}
 
       {!loading && data ? (
         <View>
@@ -57,6 +48,7 @@ const DownloadSubtitle = () => {
               justifyContent: "center",
               alignItems: "center",
               elevation: 12,
+              margin: "auto",
             }}
           >
             <Text
@@ -74,6 +66,29 @@ const DownloadSubtitle = () => {
         <View>
           <HeaderText>Generating link</HeaderText>
           <ActivityIndicator />
+          <TouchableOpacity
+            onPress={() => router.push('search')}
+            style={{
+              backgroundColor: theme.colors.primary,
+              width: 120,
+              borderRadius: 8,
+              height: 40,
+              justifyContent: "center",
+              alignItems: "center",
+              elevation: 12,
+              margin: "auto",
+            }}
+          >
+            <Text
+              style={{
+                color: theme.colors.lightWhite,
+                fontWeight: "600",
+                fontSize: 18,
+              }}
+            >
+              Run a search
+            </Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>

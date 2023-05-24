@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 type MFetchProps = {
   endpoint: string;
   method?: string;
-  headerType: "rapid-api" | "subtitle";
   extraHeaders?: Record<string, string>;
   params?: Record<string, string | number>;
   data?: Record<any, any>;
@@ -17,7 +16,7 @@ const useFetch = (fetchProps: MFetchProps) => {
     request
       .then((resp) => {
         setLoading(true);
-        setData(resp.data);
+        setData(resp.data.data);
       })
       .catch((err) => console.error("error", err))
       .finally(() => setLoading(false));
@@ -36,33 +35,24 @@ export default useFetch;
 export const mFetch = ({
   endpoint,
   method,
-  headerType,
   extraHeaders,
   params,
   data,
 }: MFetchProps) => {
   const controller = new AbortController();
-  const headers =
-    headerType === "rapid-api"
-      ? {
-          "X-RapidAPI-Key":
-            "API-KEY",
-          "X-RapidAPI-Host": "imdb8.p.rapidapi.com",
-        }
-      : {
-          "Api-Key": "API-KEY",
-        };
-  const request = axios({
+  const headers = {
+    "Api-Key": "API-KEY",
+  };
+  const options = {
     url: endpoint,
     method: method || "GET",
     headers: { ...headers, ...extraHeaders },
     signal: controller.signal,
     params,
-    transformResponse: (res) => {
-      return JSON.parse(res);
-    },
     data: data ? JSON.stringify(data) : undefined,
-  });
+  };
+
+  const request = axios(options);
 
   const abort = () => {
     controller.abort();

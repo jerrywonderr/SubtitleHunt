@@ -3,13 +3,11 @@ import {
   StyleSheet,
   Dimensions,
   View,
-  Image,
-  ActivityIndicator,
 } from "react-native";
 import theme from "../../styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { parseId } from "../../utils";
-import useFetch from "../../hooks/fetch";
+import MImage from "../MImage";
+import { useRouter } from "expo-router";
 
 const styles = StyleSheet.create({
   container: {
@@ -20,7 +18,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     justifyContent: "center",
     alignItems: "center",
-    position: 'relative'
+    position: "relative",
   },
   textContainer: {
     height: "100%",
@@ -28,44 +26,50 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.backdrop,
     alignItems: "center",
     justifyContent: "flex-end",
-    position: 'absolute'
+    position: "absolute",
   },
   text: {
     fontSize: theme.fontSize.base,
     fontWeight: "600",
     color: theme.colors.lightWhite,
     textAlign: "center",
-    marginBottom: 8
+    marginBottom: 8,
   },
 });
 
 type MostDownloadedItemProps = {
   id: string;
+  movieName: string;
+  imageURI: string;
 };
-const MostDownloadedItem = ({ id }: MostDownloadedItemProps) => {
+const MostDownloadedItem = ({
+  id,
+  movieName,
+  imageURI,
+}: MostDownloadedItemProps) => {
   const { width } = Dimensions.get("window");
-  const { data } = useFetch({
-    endpoint: "https://imdb8.p.rapidapi.com/title/get-details",
-    headerType: "rapid-api",
-    params: { tconst: parseId(id) },
-  });
-  return (
-    <TouchableOpacity style={[styles.container, { width: width / 2 - 15 }]}>
-      {data ? (
-        <>
-          <Image
-            source={{ uri: data.image.url }}
-            resizeMode="cover"
-            style={{ width: "100%", height: "100%" }}
-          />
 
-          <View style={styles.textContainer}>
-            <Text style={[styles.text]}>{data.title}</Text>
-          </View>
-        </>
-      ) : (
-        <ActivityIndicator />
-      )}
+  const router = useRouter();
+
+  return (
+    <TouchableOpacity
+      style={[styles.container, { width: width / 2 - 15 }]}
+      onPress={() =>
+        router.push({
+          pathname: "download",
+          params: { subtitle_id: id },
+        })
+      }
+    >
+      <MImage
+        source={{ uri: imageURI }}
+        resizeMode="cover"
+        style={{ width: "100%", height: "100%" }}
+      />
+
+      <View style={styles.textContainer}>
+        <Text style={[styles.text]}>{movieName}</Text>
+      </View>
     </TouchableOpacity>
   );
 };

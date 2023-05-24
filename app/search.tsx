@@ -4,14 +4,16 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Image,
   ActivityIndicator,
 } from "react-native";
 import theme from "../lib/styles";
-import { HeaderText } from "../lib/components/MText";
 import { Tabs, useRouter } from "expo-router";
 import { mFetch } from "../lib/hooks/fetch";
 import { useEffect, useState } from "react";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+
+import MImage from "../lib/components/MImage";
+import Header from "../lib/components/Header";
 
 const Search = () => {
   const router = useRouter();
@@ -27,7 +29,6 @@ const Search = () => {
         setLoading(true);
         const { request } = mFetch({
           endpoint: "https://api.opensubtitles.com/api/v1/subtitles",
-          headerType: "subtitle",
           params: { query: query },
         });
         request
@@ -54,32 +55,33 @@ const Search = () => {
     >
       <Tabs.Screen
         options={{
-          headerTitle: "Search for any subtitle",
-          headerStyle: {
-            backgroundColor: theme.colors.primary,
-          },
-          headerTitleStyle: {
-            color: theme.colors.lightWhite,
-          },
+          headerTitle: (props) => (
+            <Header title="Search for any subtitle" headerProps={props} />
+          ),
         }}
       />
       <View
         style={{
           marginVertical: 12,
+          elevation: 20,
         }}
       >
         <TextInput
           placeholder="Enter movie title here"
+          placeholderTextColor={theme.colors.lightWhite}
           onChangeText={(text: string) => setQuery(text)}
           defaultValue={query}
           style={{
-            borderWidth: 1,
-            padding: 6,
+            borderWidth: 3,
+            fontSize: 16,
+            padding: 12,
             borderRadius: 12,
+            color: theme.colors.lightWhite,
+            backgroundColor: theme.colors.primaryLight,
+            borderColor: theme.colors.primary,
           }}
         />
       </View>
-      <HeaderText>Results</HeaderText>
       {loading && (
         <View>
           <ActivityIndicator />
@@ -102,7 +104,7 @@ const Search = () => {
                 router.push({
                   pathname: "download",
                   params: {
-                    subtitle_id: item.id
+                    subtitle_id: item.id,
                   },
                 })
               }
@@ -113,9 +115,8 @@ const Search = () => {
                   height: 120,
                 }}
               >
-                <Image
+                <MImage
                   source={{ uri: item.attributes?.related_links[0].img_url }}
-                  // resizeMethod="auto"
                   resizeMode="cover"
                   style={{
                     width: "100%",
@@ -164,11 +165,6 @@ const Search = () => {
       ) : (
         <Text style={{ textAlign: "center" }}>
           Search results will appear here...
-        </Text>
-      )}
-      {!data.length && (
-        <Text style={{ textAlign: "center" }}>
-          No result found. Try something else.
         </Text>
       )}
     </View>
